@@ -1,6 +1,7 @@
 using UnityEngine;
 
-public class Putter : MonoBehaviour
+//public class Putter : MonoBehaviour
+public class Putter : Singleton<Putter>
 {
     Transform ballT;
 

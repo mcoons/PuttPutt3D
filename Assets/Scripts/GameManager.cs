@@ -1,7 +1,9 @@
 using UnityEngine;
 using Cinemachine;
 
-public class GameManager : MonoBehaviour
+public class GameManager : Singleton<GameManager>
+
+//public class GameManager : MonoBehaviour
 {
     [Header("Ball Settings")]
     public Transform ballT;
@@ -17,19 +19,20 @@ public class GameManager : MonoBehaviour
     public int currentGreenIndex = 0;
     public GameObject currentGreenObject;
 
-    public BallController ballController;
+    //public BallController ballController;
 
     public CinemachineVirtualCamera ballCam;
 
     private void OnEnable()
     {
-        ballCam = GameObject.Find("CM BallCam").GetComponent<CinemachineVirtualCamera>();
-        InitializeHole();
+        //ballCam = GameObject.Find("CM BallCam").GetComponent<CinemachineVirtualCamera>();
+        //InitializeHole();
     }
 
     void Start()
     {
-
+        ballCam = GameObject.Find("CM BallCam").GetComponent<CinemachineVirtualCamera>();
+        InitializeHole();
     }
 
     void Update()
@@ -57,13 +60,15 @@ public class GameManager : MonoBehaviour
         ballRB.velocity = Vector3.zero;
         ballRB.angularVelocity = Vector3.zero;
 
-        ballController.moving = false;
+        //ballController.moving = false;
+        BallController.Instance.moving = false;
 
         ballCam.LookAt = currentGreenObject.transform.Find("Hole").transform;
 
 
         ballT.LookAt(holeTarget);
         ballT.Find("Putter").transform.gameObject.SetActive(true);
-        ballController.powerBarT.sizeDelta = new Vector2(30, 0);
+        //ballController.powerBarT.sizeDelta = new Vector2(30, 0);
+        BallController.Instance.powerBarT.sizeDelta = new Vector2(30, 0);
     }
 }

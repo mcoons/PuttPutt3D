@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 //using Unity.Mathematics;
 
-public class BallController : MonoBehaviour
+//public class BallController : MonoBehaviour
+public class BallController : Singleton<BallController>
 {
-    public GameManager gameManager;
+    //public GameManager gameManager;
 
     Rigidbody ballRB;
     public Transform holeTarget;
@@ -28,11 +29,13 @@ public class BallController : MonoBehaviour
     void Start()
     {
 
-        Debug.Log("Current Green Name: " + gameManager.greens[gameManager.currentGreenIndex].name);
+        //Debug.Log("Current Green Name: " + gameManager.greens[gameManager.currentGreenIndex].name);
+        Debug.Log("Current Green Name: " + GameManager.Instance.greens[GameManager.Instance.currentGreenIndex].name);
         ballRB = GetComponent<Rigidbody>();
         ballRB.maxAngularVelocity = 100;  // needed ?
         putterT = transform.Find("Putter").transform;
-        holeTarget = gameManager.greens[gameManager.currentGreenIndex].transform.Find("Hole").transform;
+        //holeTarget = gameManager.greens[gameManager.currentGreenIndex].transform.Find("Hole").transform;
+        holeTarget = GameManager.Instance.greens[GameManager.Instance.currentGreenIndex].transform.Find("Hole").transform;
 
         powerBarT.sizeDelta = new Vector2(30, 0);
     }
