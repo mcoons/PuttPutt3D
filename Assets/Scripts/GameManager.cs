@@ -1,5 +1,6 @@
 using UnityEngine;
 using Cinemachine;
+using System.Collections;
 
 public class GameManager : Singleton<GameManager>
 
@@ -13,6 +14,23 @@ public class GameManager : Singleton<GameManager>
         Moving,
         Win
     }
+
+    Hashtable result = new Hashtable()
+        {
+            {"-4", "Condor"},
+            {"-3", "Albatross"},
+            {"-2", "Eagle"},
+            {"-1", "Birdie"},
+            {"0", "Par"},
+            {"1", "Bogie"},
+            {"2", "Double Bogie"},
+            {"3", "Triple Bogie"},
+            {"4", "Quadruple Bogie"}
+        };
+
+    public int par = 0;
+    public int stroke = 0;
+    public string description;
 
     public State gameState = State.Menu;
 
@@ -38,6 +56,9 @@ public class GameManager : Singleton<GameManager>
 
     void Start()
     {
+        EventManager.Instance.OnGameStateChange.AddListener(HandleOnGameStateChange);
+        EventManager.Instance.OnStroke.AddListener(HandleOnStroke);
+
         ballCam = GameObject.Find("CM BallCam").GetComponent<CinemachineVirtualCamera>();
         InitializeGreen();
         gameState = State.Menu;
@@ -60,6 +81,18 @@ public class GameManager : Singleton<GameManager>
         }
     }
 
+    public void HandleOnGameStateChange(State newState)
+    {
+        Debug.Log("State changed to " + newState);
+        gameState = newState;
+    }
+
+    public void HandleOnStroke()
+    {
+        Debug.Log("Stroke");
+        stroke++;
+    }
+
 
     public void NextGreen()
     {
@@ -77,6 +110,10 @@ public class GameManager : Singleton<GameManager>
         currentTeeStartRotation = currentGreenObject.transform.Find("Tee").transform.eulerAngles;
         holeTarget = currentGreenObject.transform.Find("Hole").transform.position;
 
+        par = currentGreenObject.GetComponent<Data>().par;
+        description = currentGreenObject.GetComponent<Data>().description;
+
+
         //BallController.Instance.moving = false;
         BallController.Instance.powerBarT.sizeDelta = new Vector2(30, 0);
 
@@ -87,6 +124,9 @@ public class GameManager : Singleton<GameManager>
         ballT.eulerAngles = currentTeeStartRotation;
         ballT.LookAt(holeTarget);
         ballT.Find("Putter").transform.gameObject.SetActive(true);
+
+        stroke = 0;
+
 
         SetVCam();
         gameState = State.Idle;

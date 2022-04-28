@@ -1,19 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-//using Unity.Mathematics;
 
 public class BallController : Singleton<BallController>
 {
     Rigidbody ballRB;
     public Transform holeTarget;
-    //public bool moving;
 
     public RectTransform powerBarT;
     public float powerBarHeight;
 
     public Transform putterT;
-    //public bool putting = false;
 
     Vector3 direction;
 
@@ -28,7 +25,6 @@ public class BallController : Singleton<BallController>
         ballRB = GetComponent<Rigidbody>();
         ballRB.maxAngularVelocity = 100;  // needed ?
         putterT = transform.Find("Putter").transform;
-        //holeTarget = GameManager.Instance.greens[GameManager.Instance.currentGreenIndex].transform.Find("Hole").transform;
         holeTarget = GameManager.Instance.currentGreenObject.transform.Find("Hole").transform;
 
         powerBarT.sizeDelta = new Vector2(30, 0);
@@ -38,19 +34,19 @@ public class BallController : Singleton<BallController>
     {
         if (ballRB.velocity.magnitude <= velocityCutoff &&
             ballRB.velocity != Vector3.zero &&
-            ballRB.angularVelocity != Vector3.zero)
+            ballRB.angularVelocity != Vector3.zero &&
+            GameManager.Instance.gameState == GameManager.State.Moving)
         {
             Debug.Log("Setting velocity to zero");
-            GameManager.Instance.gameState = GameManager.State.Idle;
+            //GameManager.Instance.gameState = GameManager.State.Idle;
+            EventManager.Instance.OnGameStateChange.Invoke(GameManager.State.Idle);
 
-            //holeTarget = GameManager.Instance.greens[GameManager.Instance.currentGreenIndex].transform.Find("Hole").transform;
             holeTarget = GameManager.Instance.currentGreenObject.transform.Find("Hole").transform;
 
             ballRB.velocity = Vector3.zero;
             ballRB.angularVelocity = Vector3.zero; 
             transform.LookAt(holeTarget);
             putterT.gameObject.SetActive(true);
-            //moving = false;
             powerBarT.sizeDelta = new Vector2(30, 0);
 
         }
@@ -60,17 +56,16 @@ public class BallController : Singleton<BallController>
             GameManager.Instance.gameState == GameManager.State.Idle)
         {
             Debug.Log("Space pressed in Ball Controller");
-            GameManager.Instance.gameState = GameManager.State.Putting;
-              
+            //GameManager.Instance.gameState = GameManager.State.Putting;
+            EventManager.Instance.OnGameStateChange.Invoke(GameManager.State.Putting);
 
-            //putting = true;
             StartCoroutine("GetPuttStrength");
         }
 
         if (Input.GetKeyUp(KeyCode.Space) && GameManager.Instance.gameState == GameManager.State.Putting)
         {
-            GameManager.Instance.gameState = GameManager.State.Moving;
-            //putting = false;
+            //GameManager.Instance.gameState = GameManager.State.Moving;
+            EventManager.Instance.OnGameStateChange.Invoke(GameManager.State.Moving);
         }
     }
 
@@ -92,8 +87,9 @@ public class BallController : Singleton<BallController>
 
             if (thrust >= 1.0f)
             {
-                //putting = false;
-                GameManager.Instance.gameState = GameManager.State.Moving;
+                //GameManager.Instance.gameState = GameManager.State.Moving;
+                EventManager.Instance.OnGameStateChange.Invoke(GameManager.State.Moving);
+
             }
             yield return null;
         }
@@ -102,7 +98,9 @@ public class BallController : Singleton<BallController>
 
     void PuttBall()
     {
-        //moving = true;
+        //GameManager.Instance.stroke++;
+        EventManager.Instance.OnStroke.Invoke();
+
         direction = transform.position - putterT.position;
 
         putterT.gameObject.SetActive(false);
@@ -111,7 +109,9 @@ public class BallController : Singleton<BallController>
 
     private void OnTriggerEnter(Collider other)
     {
-        GameManager.Instance.gameState = GameManager.State.Win;
+        //GameManager.Instance.gameState = GameManager.State.Win;
+        EventManager.Instance.OnGameStateChange.Invoke(GameManager.State.Win);
+
         Debug.Log("Hole");
     }
 
