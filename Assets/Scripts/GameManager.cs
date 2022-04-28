@@ -5,6 +5,17 @@ public class GameManager : Singleton<GameManager>
 
 //public class GameManager : MonoBehaviour
 {
+    public enum State
+    {
+        Menu,
+        Idle,
+        Putting,
+        Moving,
+        Win
+    }
+
+    public State gameState = State.Menu;
+
     [Header("Ball Settings")]
     public Transform ballT;
     public Rigidbody ballRB;
@@ -22,53 +33,70 @@ public class GameManager : Singleton<GameManager>
     //public BallController ballController;
 
     public CinemachineVirtualCamera ballCam;
-
-    private void OnEnable()
-    {
-        //ballCam = GameObject.Find("CM BallCam").GetComponent<CinemachineVirtualCamera>();
-        //InitializeHole();
-    }
+    public Transform followParentT;
+  
 
     void Start()
     {
         ballCam = GameObject.Find("CM BallCam").GetComponent<CinemachineVirtualCamera>();
-        InitializeHole();
+        InitializeGreen();
+        gameState = State.Menu;
     }
 
     void Update()
     {
+        followParentT.position = ballT.position;
+
         if (Input.GetKeyDown(KeyCode.R))
         {
             Debug.Log("(R)eset pressed");
-            InitializeHole();
+            InitializeGreen();
+        }
+
+        if (Input.GetKeyDown(KeyCode.N))
+        {
+            Debug.Log("(N)ext Green pressed");
+            NextGreen();
         }
     }
 
 
-    public void InitializeHole()
+    public void NextGreen()
+    {
+        currentGreenIndex = currentGreenIndex == greens.Length - 1 ? 0 : currentGreenIndex + 1;
+        InitializeGreen();
+    }
+
+
+    public void InitializeGreen()
     {
         currentGreenObject = greens[currentGreenIndex];
+        Debug.Log("Current Green Name: " + greens[currentGreenIndex].name);
 
         currentTeeStartPosition = currentGreenObject.transform.Find("Tee").transform.position;
         currentTeeStartRotation = currentGreenObject.transform.Find("Tee").transform.eulerAngles;
-
         holeTarget = currentGreenObject.transform.Find("Hole").transform.position;
 
-        ballT.position = currentTeeStartPosition;
-        ballT.eulerAngles = currentTeeStartRotation;
+        //BallController.Instance.moving = false;
+        BallController.Instance.powerBarT.sizeDelta = new Vector2(30, 0);
 
         ballRB.velocity = Vector3.zero;
         ballRB.angularVelocity = Vector3.zero;
 
-        //ballController.moving = false;
-        BallController.Instance.moving = false;
-
-        ballCam.LookAt = currentGreenObject.transform.Find("Hole").transform;
-
-
+        ballT.position = currentTeeStartPosition;
+        ballT.eulerAngles = currentTeeStartRotation;
         ballT.LookAt(holeTarget);
         ballT.Find("Putter").transform.gameObject.SetActive(true);
-        //ballController.powerBarT.sizeDelta = new Vector2(30, 0);
-        BallController.Instance.powerBarT.sizeDelta = new Vector2(30, 0);
+
+        SetVCam();
+        gameState = State.Idle;
     }
+
+    public void SetVCam()
+    {
+        ballCam.LookAt = currentGreenObject.transform.Find("Hole").transform;
+        followParentT.position = ballT.position;
+        followParentT.eulerAngles = ballT.eulerAngles;
+    }
+
 }
