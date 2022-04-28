@@ -6,6 +6,13 @@ public class Putter : Singleton<Putter>
     Transform ballT;
     public float putterRotationSpeed = 20.0f;
 
+
+    protected override void Awake()
+    {
+        base.Awake();
+    }
+
+
     private void Start()
     {
         ballT = GameObject.Find("Ball").transform;

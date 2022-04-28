@@ -3,8 +3,6 @@ using Cinemachine;
 using System.Collections;
 
 public class GameManager : Singleton<GameManager>
-
-//public class GameManager : MonoBehaviour
 {
     public enum State
     {
@@ -15,7 +13,7 @@ public class GameManager : Singleton<GameManager>
         Win
     }
 
-    Hashtable result = new Hashtable()
+    public Hashtable result = new Hashtable()
         {
             {"-4", "Condor"},
             {"-3", "Albatross"},
@@ -32,7 +30,7 @@ public class GameManager : Singleton<GameManager>
     public int stroke = 0;
     public string description;
 
-    public State gameState = State.Menu;
+    public State gameState;
 
     [Header("Ball Settings")]
     public Transform ballT;
@@ -48,19 +46,26 @@ public class GameManager : Singleton<GameManager>
     public int currentGreenIndex = 0;
     public GameObject currentGreenObject;
 
-    //public BallController ballController;
-
     public CinemachineVirtualCamera ballCam;
     public Transform followParentT;
-  
+
+
+    protected override void Awake()
+    {
+        base.Awake();
+    }
 
     void Start()
     {
         EventManager.Instance.OnGameStateChange.AddListener(HandleOnGameStateChange);
         EventManager.Instance.OnStroke.AddListener(HandleOnStroke);
+        EventManager.Instance.OnNextGreen.AddListener(HandleOnNextGreen);
+        EventManager.Instance.OnInitializeGreen.AddListener(InitializeGreen);
 
         ballCam = GameObject.Find("CM BallCam").GetComponent<CinemachineVirtualCamera>();
         InitializeGreen();
+        stroke = 0;
+
         gameState = State.Menu;
     }
 
@@ -81,28 +86,39 @@ public class GameManager : Singleton<GameManager>
         }
     }
 
-    public void HandleOnGameStateChange(State newState)
+    // Event Handlers
+
+    void HandleOnGameStateChange(State newState)
     {
         Debug.Log("State changed to " + newState);
         gameState = newState;
+
     }
 
-    public void HandleOnStroke()
+    void HandleOnStroke()
     {
         Debug.Log("Stroke");
         stroke++;
     }
 
-
-    public void NextGreen()
+    void HandleOnNextGreen()
     {
-        currentGreenIndex = currentGreenIndex == greens.Length - 1 ? 0 : currentGreenIndex + 1;
-        InitializeGreen();
+        NextGreen();
     }
 
 
-    public void InitializeGreen()
+    void NextGreen()
     {
+        currentGreenIndex = currentGreenIndex == greens.Length - 1 ? 0 : currentGreenIndex + 1;
+        InitializeGreen();
+        stroke = 0;
+
+    }
+
+
+    void InitializeGreen()
+    {
+
         currentGreenObject = greens[currentGreenIndex];
         Debug.Log("Current Green Name: " + greens[currentGreenIndex].name);
 
@@ -115,28 +131,27 @@ public class GameManager : Singleton<GameManager>
 
 
         //BallController.Instance.moving = false;
-        BallController.Instance.powerBarT.sizeDelta = new Vector2(30, 0);
+        //BallController.Instance.powerBarT.sizeDelta = new Vector2(30, 0);
 
-        ballRB.velocity = Vector3.zero;
-        ballRB.angularVelocity = Vector3.zero;
+        //EventManager.Instance.OnInitializeGreen.Invoke();
 
-        ballT.position = currentTeeStartPosition;
-        ballT.eulerAngles = currentTeeStartRotation;
-        ballT.LookAt(holeTarget);
-        ballT.Find("Putter").transform.gameObject.SetActive(true);
+        ballRB.velocity = Vector3.zero;  // message?
+        ballRB.angularVelocity = Vector3.zero;  // message?
 
-        stroke = 0;
-
+        ballT.position = currentTeeStartPosition;  // message?
+        ballT.eulerAngles = currentTeeStartRotation;  // message?
+        ballT.LookAt(holeTarget);  // message?
+        ballT.Find("Putter").transform.gameObject.SetActive(true);  // message?
 
         SetVCam();
         gameState = State.Idle;
     }
 
-    public void SetVCam()
+    void SetVCam()
     {
-        ballCam.LookAt = currentGreenObject.transform.Find("Hole").transform;
-        followParentT.position = ballT.position;
-        followParentT.eulerAngles = ballT.eulerAngles;
+        ballCam.LookAt = currentGreenObject.transform.Find("Hole").transform;  // message?
+        followParentT.position = ballT.position;  // message?
+        followParentT.eulerAngles = ballT.eulerAngles;  // message?
     }
 
 }
