@@ -14,17 +14,17 @@ public class GameManager : Singleton<GameManager>
     }
 
     public Hashtable result = new Hashtable()
-        {
-            {"-4", "Condor"},
-            {"-3", "Albatross"},
-            {"-2", "Eagle"},
-            {"-1", "Birdie"},
-            {"0", "Par"},
-            {"1", "Bogie"},
-            {"2", "Double Bogie"},
-            {"3", "Triple Bogie"},
-            {"4", "Quadruple Bogie"}
-        };
+    {
+        {"-4", "Condor"},
+        {"-3", "Albatross"},
+        {"-2", "Eagle"},
+        {"-1", "Birdie"},
+        {"0", "Par"},
+        {"1", "Bogie"},
+        {"2", "Double Bogie"},
+        {"3", "Triple Bogie"},
+        {"4", "Quadruple Bogie"}
+    };
 
     public int par = 0;
     public int stroke = 0;
