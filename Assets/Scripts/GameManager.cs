@@ -26,29 +26,24 @@ public class GameManager : Singleton<GameManager>
         {"4", "Quadruple Bogie"}
     };
 
-    public int par = 0;
-    public int stroke = 0;
-    public string description;
-
-    public State gameState;
-
-    [Header("Ball Settings")]
-    public Transform ballT;
-    public Rigidbody ballRB;
-
-    public Vector3 currentTeeStartPosition;
-    public Vector3 currentTeeStartRotation;
-
-    Vector3 holeTarget;
-
-    public GameObject[] greens;
-
-    public int currentGreenIndex = 0;
-    public GameObject currentGreenObject;
 
     public CinemachineVirtualCamera ballCam;
     public Transform followParentT;
+    public Transform ballT;
+    public Rigidbody ballRB;
+    public GameObject[] greens;
+    public GameObject currentGreenObject;
+    public int currentGreenIndex = 0;
+    public int par = 0;
+    public int stroke = 0;
 
+    public State gameState;
+
+    Vector3 holeTarget;
+
+    [SerializeField] string description;
+    [SerializeField] Vector3 currentTeeStartPosition;
+    [SerializeField] Vector3 currentTeeStartRotation;
 
     protected override void Awake()
     {
@@ -75,29 +70,32 @@ public class GameManager : Singleton<GameManager>
 
         if (Input.GetKeyDown(KeyCode.R))
         {
-            Debug.Log("(R)eset pressed");
+            Debug.Log("GameManager: (R)eset pressed");
             InitializeGreen();
         }
 
         if (Input.GetKeyDown(KeyCode.N))
         {
-            Debug.Log("(N)ext Green pressed");
+            Debug.Log("GameManager: (N)ext Green pressed");
             NextGreen();
         }
+    }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
     }
 
     // Event Handlers
 
     void HandleOnGameStateChange(State newState)
     {
-        Debug.Log("State changed to " + newState);
+        Debug.Log("GameManager: HandleOnGameStateChange: State changed to " + newState);
         gameState = newState;
-
     }
 
     void HandleOnStroke()
     {
-        Debug.Log("Stroke");
         stroke++;
     }
 
@@ -112,7 +110,6 @@ public class GameManager : Singleton<GameManager>
         currentGreenIndex = currentGreenIndex == greens.Length - 1 ? 0 : currentGreenIndex + 1;
         InitializeGreen();
         stroke = 0;
-
     }
 
 
@@ -120,7 +117,7 @@ public class GameManager : Singleton<GameManager>
     {
 
         currentGreenObject = greens[currentGreenIndex];
-        Debug.Log("Current Green Name: " + greens[currentGreenIndex].name);
+        Debug.Log("GameManager: InitializeGreen: Current Green Name: " + greens[currentGreenIndex].name);
 
         currentTeeStartPosition = currentGreenObject.transform.Find("Tee").transform.position;
         currentTeeStartRotation = currentGreenObject.transform.Find("Tee").transform.eulerAngles;
@@ -128,10 +125,6 @@ public class GameManager : Singleton<GameManager>
 
         par = currentGreenObject.GetComponent<Data>().par;
         description = currentGreenObject.GetComponent<Data>().description;
-
-
-        //BallController.Instance.moving = false;
-        //BallController.Instance.powerBarT.sizeDelta = new Vector2(30, 0);
 
         //EventManager.Instance.OnInitializeGreen.Invoke();
 

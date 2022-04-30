@@ -4,21 +4,18 @@ using UnityEngine;
 
 public class BallController : Singleton<BallController>
 {
-    Rigidbody ballRB;
     public Transform holeTarget;
-
-    public float powerBarHeight;
-
     public Transform putterT;
-
-    Vector3 direction;
-
     public float thrust = 0.0f;  // 0 to 1
     public float thrustMultiplier = 50.0f;
     public float velocityCutoff = 0.2f;
 
-    public int touchedGreenCount = 0;
-    public int touchedRampCount = 0;
+    Rigidbody ballRB;
+    Vector3 direction;
+
+    [SerializeField] float powerBarHeight;
+    [SerializeField] int touchedGreenCount = 0;
+    [SerializeField] int touchedRampCount = 0;
 
     protected override void Awake()
     {
@@ -41,11 +38,13 @@ public class BallController : Singleton<BallController>
         if (ballRB.velocity.magnitude <= velocityCutoff &&
             ballRB.velocity != Vector3.zero &&
             ballRB.angularVelocity != Vector3.zero &&
-            GameManager.Instance.gameState == GameManager.State.Moving &&
+            //GameManager.Instance.gameState == GameManager.State.Moving &&
+            GameManager.Instance.gameState != GameManager.State.Win &&
             OnGreen() &&
             !OnRamp())
         {
-            Debug.Log("Setting velocity to zero");
+            Debug.Log("BallController: FixedUpdate: Setting velocity to zero");
+            Debug.Log("-- BallController: FixedUpdate: Invoking OnGameStateChange to Idle");
             EventManager.Instance.OnGameStateChange.Invoke(GameManager.State.Idle);
 
             holeTarget = GameManager.Instance.currentGreenObject.transform.Find("Hole").transform;
@@ -53,38 +52,39 @@ public class BallController : Singleton<BallController>
             ballRB.velocity = Vector3.zero;
             ballRB.angularVelocity = Vector3.zero;
 
-
             transform.LookAt(holeTarget);
 
             // if easy mode aim putter at hole
-            putterT.localPosition = new Vector3(0, 0, -0.936f);  // message?
-            putterT.localRotation = Quaternion.identity;  // message?
-            putterT.gameObject.SetActive(true);  // message?
+            putterT.localPosition = new Vector3(0, 0, -0.936f);
+            putterT.localRotation = Quaternion.identity;
+            putterT.gameObject.SetActive(true);
 
+            Debug.Log("-- BallController: FixedUpdate: Invoking OnPowerBarSizeChange");
             EventManager.Instance.OnPowerBarSizeChange.Invoke(new Vector2(30, 0));
         }
     }
 
     private void Update()
     {
+        if (GameManager.Instance.gameState == GameManager.State.Moving && putterT.gameObject.activeSelf)
+        {
+            putterT.gameObject.SetActive(false);
+        }
+
         holeTarget = GameManager.Instance.currentGreenObject.transform.Find("Hole").transform;
 
         transform.LookAt(holeTarget);
 
-        if (transform.position.y < -10)
-        {
-            EventManager.Instance.OnInitializeGreen.Invoke();
-            EventManager.Instance.OnPowerBarSizeChange.Invoke(new Vector2(30, 0));
-        }
-
         if (Input.GetKeyDown(KeyCode.Space) && GameManager.Instance.gameState == GameManager.State.Idle)
         {
+            Debug.Log("-- BallController: Update: Invoking OnGameStateChange to Putting");
             EventManager.Instance.OnGameStateChange.Invoke(GameManager.State.Putting);
             StartCoroutine("GetPuttStrength");
         }
         else
         if (Input.GetKeyUp(KeyCode.Space) && GameManager.Instance.gameState == GameManager.State.Putting)
         {
+            Debug.Log("-- BallController: Update: Invoking OnGameStateChange to Moving");
             EventManager.Instance.OnGameStateChange.Invoke(GameManager.State.Moving);
         }
     }
@@ -125,10 +125,12 @@ public class BallController : Singleton<BallController>
         {
             thrust += 0.5f * Time.deltaTime;
             powerBarHeight = Remap(thrust, 0, 1.0f, 0, 200.0f);
+            Debug.Log("-- BallController: GetPuttStrength: Invoking OnPowerBarSizeChange");
             EventManager.Instance.OnPowerBarSizeChange.Invoke(new Vector2(30, powerBarHeight));
 
             if (thrust >= 1.0f)
             {
+                Debug.Log("-- BallController: GetPuttStrength: Invoking OnGameStateChange to Moving");
                 EventManager.Instance.OnGameStateChange.Invoke(GameManager.State.Moving);
             }
             yield return null;
@@ -138,6 +140,7 @@ public class BallController : Singleton<BallController>
 
     void PuttBall()
     {
+        Debug.Log("-- BallController: PuttBall: Invoking OnStroke");
         EventManager.Instance.OnStroke.Invoke();
 
         direction = transform.position - putterT.position;
@@ -150,8 +153,9 @@ public class BallController : Singleton<BallController>
     {
         if (other.gameObject.tag == "HoleTrigger")
         {
+            Debug.Log("BallController: OnTriggerEnter: Tag = HoleTrigger");
+            Debug.Log("-- BallController: OnTriggerEnter: Invoking OnGameStateChange to Win");
             EventManager.Instance.OnGameStateChange.Invoke(GameManager.State.Win);
-            Debug.Log("Hole");
         }
     }
 
@@ -169,11 +173,21 @@ public class BallController : Singleton<BallController>
     {
         if (other.gameObject.tag == "Green")
         {
+            Debug.Log("BallController: OnCollisionEnter: Tag = Green  touchedRampCount++");
             touchedGreenCount++;
         } else
         if (other.gameObject.tag == "Ramp")
         {
+            Debug.Log("BallController: OnCollisionEnter: Tag = Ramp  touchedRampCount++");
             touchedRampCount++;
+        } else
+        if (other.gameObject.tag == "Terrain")
+        {
+            Debug.Log("BallController: OnCollisionEnter: Tag = Terrain");
+            Debug.Log("-- BallController: OnCollisionEnter: Invoking OnInitializeGreen");
+            EventManager.Instance.OnInitializeGreen.Invoke();
+            Debug.Log("-- BallController: OnCollisionEnter: Invoking OnPowerBarSizeChange");
+            EventManager.Instance.OnPowerBarSizeChange.Invoke(new Vector2(30, 0));
         }
     }
 
@@ -181,10 +195,12 @@ public class BallController : Singleton<BallController>
     {
         if (other.gameObject.tag == "Green")
         {
+            Debug.Log("BallController: OnCollisionExit: Tag = Green  touchedRampCount--");
             touchedGreenCount--;
         }else
         if (other.gameObject.tag == "Ramp")
         {
+            Debug.Log("BallController: OnCollisionExit: Tag = Ramp  touchedRampCount--");
             touchedRampCount--;
         }
     }

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class lb_BirdController : MonoBehaviour {
 	public int idealNumberOfBirds;
@@ -28,6 +29,10 @@ public class lb_BirdController : MonoBehaviour {
 	int activeBirds = 0;
 	int birdIndex = 0;
 	GameObject[] featherEmitters = new GameObject[3];
+
+	public Slider birdSlider;
+
+
 
 	public void AllFlee(){
 		if(!pause){
@@ -73,6 +78,14 @@ public class lb_BirdController : MonoBehaviour {
 
 	public void ChangeCamera(Camera cam){
 		currentCamera = cam;
+	}
+
+	public void SetBirdCount(float value)
+	{
+		//Debug.Log("In BirdCount");
+		idealNumberOfBirds = (int)value;
+		maximumNumberOfBirds = (int)value;
+		AllFlee();
 	}
 
 	void Start () {
@@ -147,6 +160,8 @@ public class lb_BirdController : MonoBehaviour {
 	}
 
 	void OnEnable(){
+		//birdSlider.onValueChanged.AddListener(((int)value) => { idealNumberOfBirds = value; });
+
 		InvokeRepeating("UpdateBirds",1,1);
 		StartCoroutine("UpdateTargets");
 	}
