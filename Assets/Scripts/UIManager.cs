@@ -12,19 +12,67 @@ public class UIManager : MonoBehaviour
     public GameObject instructionsButton;
     public GameObject settingsPanel;
     public GameObject instructionsPanel;
-    
+    public GameObject resultText;
+    public RectTransform powerBar;
 
     public EventSystem eventSystem;
+    public string result;
 
-    void Start()
-    {
+    #region Unity callbacks
+
+        void Start()
+        {
+        EventManager.Instance.OnGameStateChange.AddListener(HandleWin);
+        EventManager.Instance.OnPowerBarSizeChange.AddListener(HandlePowerBarSizeChange);
+
         eventSystem.SetSelectedGameObject(instructionsPanel.transform.Find("Exit Button").gameObject);
+        }
+
+        private void Update()
+        {
+            parText.GetComponent<TextMeshProUGUI>().text = "Par: " + GameManager.Instance.par.ToString();
+            strokeText.GetComponent<TextMeshProUGUI>().text = "Stroke: " +GameManager.Instance.stroke.ToString();
+        }
+
+    #endregion
+
+    void HandleWin(GameManager.State newState)
+    {
+        if ( newState == GameManager.State.Win)
+        {
+            Debug.Log("UIManager: " + GameManager.Instance.result[(GameManager.Instance.stroke - GameManager.Instance.par).ToString()]);
+
+            StartCoroutine("ShowWinAndNext");
+
+
+        }
     }
 
-    private void Update()
+    IEnumerator ShowWinAndNext()
     {
-        parText.GetComponent<TextMeshProUGUI>().text = "Par: " + GameManager.Instance.par.ToString();
-        strokeText.GetComponent<TextMeshProUGUI>().text = "Stroke: " +GameManager.Instance.stroke.ToString();
+        result = (string)GameManager.Instance.result[(GameManager.Instance.stroke - GameManager.Instance.par).ToString()];
+
+        if (result == null || result == "")
+        {
+            result = "Wow, impressive!";
+        }
+
+        resultText.GetComponent<TextMeshProUGUI>().text = result;
+        resultText.SetActive(true);
+        SetMainItems(false);
+
+        yield return new WaitForSeconds(5);
+
+        resultText.SetActive(false);
+        SetMainItems(true);
+        powerBar.sizeDelta = new Vector2(30, 0);
+        EventManager.Instance.OnNextGreen.Invoke();
+
+    }
+
+    public void HandlePowerBarSizeChange(Vector2 newSize)
+    {
+        powerBar.sizeDelta = newSize;
     }
 
     public void OnSettingsClick()
@@ -77,7 +125,7 @@ public class UIManager : MonoBehaviour
 
     }
 
-    // Wait one frame to clear Space/Return button press
+    // Wait one frame to clear Space/Return key press
     IEnumerator SetIdleNextFrame()
     {
         yield return null;

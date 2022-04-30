@@ -1,10 +1,19 @@
 using UnityEngine;
 
-//public class Putter : MonoBehaviour
 public class Putter : Singleton<Putter>
 {
     Transform ballT;
     public float putterRotationSpeed = 20.0f;
+
+    protected override void Awake()
+    {
+        base.Awake();
+    }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+    }
 
     private void Start()
     {
@@ -17,7 +26,6 @@ public class Putter : Singleton<Putter>
         {
             return;
         }
-
 
         if (Input.GetKeyDown(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
         {
