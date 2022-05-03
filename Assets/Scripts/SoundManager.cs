@@ -6,6 +6,7 @@ public class SoundManager : MonoBehaviour
     public lb_BirdController birdController;
     public GameObject puttAudio;
     public GameObject holeAudio;
+    public GameObject bounceAudio;
 
     public AudioSource audioSource;
     public AudioClip[] audioSources;
@@ -16,6 +17,7 @@ public class SoundManager : MonoBehaviour
     void Start()
     {
         EventManager.Instance.OnGameStateChange.AddListener(HandleOnGameStateChange);
+        //EventManager.Instance.OnCollision.AddListener(HandleOnCollision);
         StartCoroutine("BackgroundSounds");
     }
 
@@ -32,6 +34,11 @@ public class SoundManager : MonoBehaviour
         }
     }
 
+    //void HandleOnCollision(GameObject other)
+    //{
+    //    StartCoroutine("PlayBounce");
+    //}
+
     IEnumerator PlayPutt()
     {
         puttAudio.SetActive(true);
@@ -44,6 +51,13 @@ public class SoundManager : MonoBehaviour
         holeAudio.SetActive(true);
         yield return new WaitForSeconds(0.5f);
         holeAudio.SetActive(false);
+    }
+
+    IEnumerator PlayBounce()
+    {
+        bounceAudio.SetActive(true);
+        yield return new WaitForSeconds(0.05f);
+        bounceAudio.SetActive(false);
     }
 
 

@@ -9,6 +9,7 @@ public class GameManager : Singleton<GameManager>
         Menu,
         Idle,
         Putting,
+        Putting2,
         Moving,
         Win
     }
@@ -70,19 +71,21 @@ public class GameManager : Singleton<GameManager>
 
         if (Input.GetKeyDown(KeyCode.R))
         {
-            Debug.Log("GameManager: (R)eset pressed");
             InitializeGreen();
         }
 
         if (Input.GetKeyDown(KeyCode.N))
         {
-            Debug.Log("GameManager: (N)ext Green pressed");
             NextGreen();
         }
     }
 
     protected override void OnDestroy()
     {
+        EventManager.Instance.OnGameStateChange.RemoveListener(HandleOnGameStateChange);
+        EventManager.Instance.OnStroke.RemoveListener(HandleOnStroke);
+        EventManager.Instance.OnNextGreen.RemoveListener(HandleOnNextGreen);
+        EventManager.Instance.OnInitializeGreen.RemoveListener(InitializeGreen);
         base.OnDestroy();
     }
 
@@ -90,7 +93,6 @@ public class GameManager : Singleton<GameManager>
 
     void HandleOnGameStateChange(State newState)
     {
-        Debug.Log("GameManager: HandleOnGameStateChange: State changed to " + newState);
         gameState = newState;
     }
 
@@ -117,7 +119,6 @@ public class GameManager : Singleton<GameManager>
     {
 
         currentGreenObject = greens[currentGreenIndex];
-        Debug.Log("GameManager: InitializeGreen: Current Green Name: " + greens[currentGreenIndex].name);
 
         currentTeeStartPosition = currentGreenObject.transform.Find("Tee").transform.position;
         currentTeeStartRotation = currentGreenObject.transform.Find("Tee").transform.eulerAngles;
@@ -125,8 +126,6 @@ public class GameManager : Singleton<GameManager>
 
         par = currentGreenObject.GetComponent<Data>().par;
         description = currentGreenObject.GetComponent<Data>().description;
-
-        //EventManager.Instance.OnInitializeGreen.Invoke();
 
         ballRB.velocity = Vector3.zero;  // message?
         ballRB.angularVelocity = Vector3.zero;  // message?

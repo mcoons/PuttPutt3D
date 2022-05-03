@@ -9,18 +9,24 @@ public class CustomEvents
 {
     [System.Serializable] public class EventGameStateChange : UnityEvent<GameManager.State> { }
     [System.Serializable] public class EventStroke : UnityEvent { }
-    [System.Serializable] public class InitializeGreen : UnityEvent { }
-    [System.Serializable] public class NextGreen : UnityEvent { }
-    [System.Serializable] public class PowerBarSizeChange : UnityEvent<Vector2> { }
+    [System.Serializable] public class EventInitializeGreen : UnityEvent { }
+    [System.Serializable] public class EventNextGreen : UnityEvent { }
+    [System.Serializable] public class EventPutterEnable : UnityEvent { }
+    [System.Serializable] public class EventPutterDisable : UnityEvent { }
+    //[System.Serializable] public class Collision : UnityEvent<GameObject> { }
+    [System.Serializable] public class EventPowerBarSizeChange : UnityEvent<Vector2> { }
 }
 
 public class EventManager : Singleton<EventManager>
 {
     public CustomEvents.EventGameStateChange OnGameStateChange;
     public CustomEvents.EventStroke OnStroke;
-    public CustomEvents.InitializeGreen OnInitializeGreen;
-    public CustomEvents.NextGreen OnNextGreen;
-    public CustomEvents.PowerBarSizeChange OnPowerBarSizeChange;
+    public CustomEvents.EventInitializeGreen OnInitializeGreen;
+    public CustomEvents.EventNextGreen OnNextGreen;
+    public CustomEvents.EventPutterEnable OnPutterEnable;
+    public CustomEvents.EventPutterDisable OnPutterDisable;
+    //public CustomEvents.Collision OnCollision;
+    public CustomEvents.EventPowerBarSizeChange OnPowerBarSizeChange;
 
     protected override void Awake()
     {
