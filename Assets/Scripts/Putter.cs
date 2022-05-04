@@ -1,3 +1,11 @@
+/*
+ 
+Listens for:
+    OnGameStateChange
+
+*/
+
+
 using UnityEngine;
 
 public class Putter : Singleton<Putter>
@@ -13,18 +21,12 @@ public class Putter : Singleton<Putter>
     private void Start()
     {
         ballT = GameObject.Find("Ball").transform;
-        //EventManager.Instance.OnPutterEnable.AddListener(HandleOnPutterEnable);
-        //EventManager.Instance.OnPutterDisable.AddListener(HandleOnPutterDisable);
         EventManager.Instance.OnGameStateChange.AddListener(HandleOnGameStateChange);
-
     }
 
     protected override void OnDestroy()
     {
-        //EventManager.Instance.OnPutterEnable.RemoveListener(HandleOnPutterEnable);
-        //EventManager.Instance.OnPutterDisable.RemoveListener(HandleOnPutterDisable);
         EventManager.Instance.OnGameStateChange.RemoveListener(HandleOnGameStateChange);
-
         base.OnDestroy();
     }
 
@@ -34,7 +36,7 @@ public class Putter : Singleton<Putter>
         {
             return;
         }
-
+        else
         if (Input.GetKeyDown(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
         {
             transform.RotateAround(ballT.position, Vector3.up, -putterRotationSpeed * Time.deltaTime);
@@ -44,34 +46,20 @@ public class Putter : Singleton<Putter>
         {
             transform.RotateAround(ballT.position, Vector3.up, putterRotationSpeed * Time.deltaTime);
         }
-
-        // Rotate the putter every frame so it keeps looking at the ball
-        //transform.LookAt(ballT);
     }
-
-    //void HandleOnPutterEnable()
-    //{
-
-    //    transform.LookAt(ballT);
-
-    //}
-
-    //void HandleOnPutterDisable()
-    //{
-
-    //}
 
     void HandleOnGameStateChange(GameManager.State newState)
     {
-        if (GameManager.Instance.gameState == GameManager.State.Moving && gameObject.activeSelf)
-        {
-            gameObject.SetActive(false);
+        //if (GameManager.Instance.gameState == GameManager.State.Moving && gameObject.activeSelf)
+        if (newState == GameManager.State.Moving && gameObject.activeSelf)
+            {
+                gameObject.SetActive(false);
         }
-        if (GameManager.Instance.gameState == GameManager.State.Idle && !gameObject.activeSelf)
+        else
+        //if (GameManager.Instance.gameState == GameManager.State.Idle && !gameObject.activeSelf)
+        if (newState == GameManager.State.Idle && !gameObject.activeSelf)
         {
             gameObject.SetActive(true);
-            //transform.LookAt(ballT);
-
         }
     }
 

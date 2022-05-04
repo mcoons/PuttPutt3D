@@ -17,7 +17,6 @@ public class SoundManager : MonoBehaviour
     void Start()
     {
         EventManager.Instance.OnGameStateChange.AddListener(HandleOnGameStateChange);
-        //EventManager.Instance.OnCollision.AddListener(HandleOnCollision);
         StartCoroutine("BackgroundSounds");
     }
 
@@ -28,16 +27,11 @@ public class SoundManager : MonoBehaviour
             StartCoroutine("PlayPutt");
         }
 
-        if (newState == GameManager.State.Win)
+        if (newState == GameManager.State.Hole)
         {
             StartCoroutine("PlayHole");
         }
     }
-
-    //void HandleOnCollision(GameObject other)
-    //{
-    //    StartCoroutine("PlayBounce");
-    //}
 
     IEnumerator PlayPutt()
     {
@@ -59,7 +53,6 @@ public class SoundManager : MonoBehaviour
         yield return new WaitForSeconds(0.05f);
         bounceAudio.SetActive(false);
     }
-
 
     IEnumerator BackgroundSounds()
     {

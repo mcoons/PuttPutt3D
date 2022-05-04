@@ -634,12 +634,6 @@ MonoBehaviour:
   OnNextGreen:
     m_PersistentCalls:
       m_Calls: []
-  OnPutterEnable:
-    m_PersistentCalls:
-      m_Calls: []
-  OnPutterDisable:
-    m_PersistentCalls:
-      m_Calls: []
   OnPowerBarSizeChange:
     m_PersistentCalls:
       m_Calls: []
@@ -758,6 +752,11 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1190484934 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2060135750401716231, guid: 3f029d975cef9499f827414131b05dbc, type: 3}
+  m_PrefabInstance: {fileID: 1268186462}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1214972727 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 687308839, guid: 3f029d975cef9499f827414131b05dbc, type: 3}
@@ -803,7 +802,7 @@ PrefabInstance:
       objectReference: {fileID: 628700743}
     - target: {fileID: 8852262153666686417, guid: 4b6eb238157e944d7a3fc2c12459e06e, type: 3}
       propertyPath: currentGreenIndex
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8852262153666686417, guid: 4b6eb238157e944d7a3fc2c12459e06e, type: 3}
       propertyPath: greens.Array.size
@@ -878,6 +877,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1018090592}
     m_Modifications:
+    - target: {fileID: 501669312, guid: 3f029d975cef9499f827414131b05dbc, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 687308839, guid: 3f029d975cef9499f827414131b05dbc, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
@@ -886,6 +889,14 @@ PrefabInstance:
       propertyPath: eventSystem
       value: 
       objectReference: {fileID: 1062599996}
+    - target: {fileID: 741252147, guid: 3f029d975cef9499f827414131b05dbc, type: 3}
+      propertyPath: gameOverText
+      value: 
+      objectReference: {fileID: 1190484934}
+    - target: {fileID: 741252147, guid: 3f029d975cef9499f827414131b05dbc, type: 3}
+      propertyPath: gameOverPanel
+      value: 
+      objectReference: {fileID: 1268186464}
     - target: {fileID: 1243628241, guid: 3f029d975cef9499f827414131b05dbc, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
@@ -898,6 +909,34 @@ PrefabInstance:
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[2].m_Target
       value: 
       objectReference: {fileID: 1479024028}
+    - target: {fileID: 7364977141669300, guid: 3f029d975cef9499f827414131b05dbc, type: 3}
+      propertyPath: m_Name
+      value: Title Text (TMP)
+      objectReference: {fileID: 0}
+    - target: {fileID: 531395953031983342, guid: 3f029d975cef9499f827414131b05dbc, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 902126231220220977, guid: 3f029d975cef9499f827414131b05dbc, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 902126231220220977, guid: 3f029d975cef9499f827414131b05dbc, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 902126231220220977, guid: 3f029d975cef9499f827414131b05dbc, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 2033084656328075992, guid: 3f029d975cef9499f827414131b05dbc, type: 3}
+      propertyPath: m_text
+      value: Game Over
+      objectReference: {fileID: 0}
+    - target: {fileID: 2249676532622270269, guid: 3f029d975cef9499f827414131b05dbc, type: 3}
+      propertyPath: m_HorizontalAlignment
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4872511185231216873, guid: 3f029d975cef9499f827414131b05dbc, type: 3}
       propertyPath: m_Name
       value: UIManager
@@ -986,8 +1025,29 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4872511185231216879, guid: 3f029d975cef9499f827414131b05dbc, type: 3}
+      propertyPath: m_UiScaleMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4872511185231216879, guid: 3f029d975cef9499f827414131b05dbc, type: 3}
+      propertyPath: m_MatchWidthOrHeight
+      value: 0.21
+      objectReference: {fileID: 0}
+    - target: {fileID: 7116049532107718090, guid: 3f029d975cef9499f827414131b05dbc, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -111.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 7847061078016136855, guid: 3f029d975cef9499f827414131b05dbc, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -166.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3f029d975cef9499f827414131b05dbc, type: 3}
+--- !u!1 &1268186464 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 531395953031983342, guid: 3f029d975cef9499f827414131b05dbc, type: 3}
+  m_PrefabInstance: {fileID: 1268186462}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1366429534
 GameObject:
   m_ObjectHideFlags: 0
@@ -1885,6 +1945,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 723808568}
     m_Modifications:
+    - target: {fileID: 23961785, guid: 8660843e3306b451ab132fe59f962dbc, type: 3}
+      propertyPath: description
+      value: Green 3
+      objectReference: {fileID: 0}
     - target: {fileID: 386549396827219056, guid: 8660843e3306b451ab132fe59f962dbc, type: 3}
       propertyPath: m_TagString
       value: lb_groundTarget
@@ -2000,6 +2064,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1146958592127907661, guid: f60e034b285724b5f826226b2e8db13f, type: 3}
+      propertyPath: description
+      value: Green 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1211789393807468158, guid: f60e034b285724b5f826226b2e8db13f, type: 3}
       propertyPath: m_Name
       value: Green1
@@ -2022,6 +2090,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 723808568}
     m_Modifications:
+    - target: {fileID: 1491610871, guid: c79fe73a41aa44a71941fb5d2c21d9eb, type: 3}
+      propertyPath: description
+      value: Green 2
+      objectReference: {fileID: 0}
     - target: {fileID: 868878323650517023, guid: c79fe73a41aa44a71941fb5d2c21d9eb, type: 3}
       propertyPath: m_TagString
       value: lb_groundTarget

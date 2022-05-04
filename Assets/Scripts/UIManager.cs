@@ -11,8 +11,10 @@ public class UIManager : MonoBehaviour
     public GameObject settingsButton;
     public GameObject instructionsButton;
     public GameObject settingsPanel;
+    public GameObject gameOverPanel;
     public GameObject instructionsPanel;
     public GameObject resultText;
+    public GameObject gameOverText;
     public RectTransform powerBar;
 
     public EventSystem eventSystem;
@@ -22,35 +24,44 @@ public class UIManager : MonoBehaviour
 
         void Start()
         {
-        EventManager.Instance.OnGameStateChange.AddListener(HandleWin);
-        EventManager.Instance.OnPowerBarSizeChange.AddListener(HandlePowerBarSizeChange);
+            EventManager.Instance.OnGameStateChange.AddListener(HandleHole);
+            EventManager.Instance.OnPowerBarSizeChange.AddListener(HandlePowerBarSizeChange);
 
-        eventSystem.SetSelectedGameObject(instructionsPanel.transform.Find("Exit Button").gameObject);
+            eventSystem.SetSelectedGameObject(instructionsPanel.transform.Find("Exit Button").gameObject);
         }
 
         private void Update()
         {
-            parText.GetComponent<TextMeshProUGUI>().text = "Par: " + GameManager.Instance.par.ToString();
-            strokeText.GetComponent<TextMeshProUGUI>().text = "Stroke: " +GameManager.Instance.stroke.ToString();
+            parText.GetComponent<TextMeshProUGUI>().text = "Par: " + GetPar().ToString();
+            strokeText.GetComponent<TextMeshProUGUI>().text = "Stroke: " + GetStrokes().ToString();
         }
 
     #endregion
 
-    void HandleWin(GameManager.State newState)
+    void HandleHole(GameManager.State newState)
     {
-        if ( newState == GameManager.State.Win)
+        if ( newState == GameManager.State.Hole)
         {
-            Debug.Log("UIManager: " + GameManager.Instance.result[(GameManager.Instance.stroke - GameManager.Instance.par).ToString()]);
+            Debug.Log("UIManager: " +
+                GameManager.Instance.result[ (GetStrokes() - GetPar()).ToString()]);
 
-            StartCoroutine("ShowWinAndNext");
-
-
+            StartCoroutine("ShowScoreAndNext");
         }
     }
 
-    IEnumerator ShowWinAndNext()
+    int GetPar()
     {
-        result = (string)GameManager.Instance.result[(GameManager.Instance.stroke - GameManager.Instance.par).ToString()];
+        return GameManager.Instance.scores[GameManager.Instance.currentGreenIndex].par;
+    }
+
+    int GetStrokes()
+    {
+        return GameManager.Instance.scores[GameManager.Instance.currentGreenIndex].strokes;
+    }
+
+    IEnumerator ShowScoreAndNext()
+    {
+        result = (string)GameManager.Instance.result[(GetStrokes() - GetPar()).ToString()];
 
         if (result == null || result == "")
         {
@@ -64,9 +75,27 @@ public class UIManager : MonoBehaviour
         yield return new WaitForSeconds(5);
 
         resultText.SetActive(false);
-        SetMainItems(true);
-        powerBar.sizeDelta = new Vector2(30, 0);
-        EventManager.Instance.OnNextGreen.Invoke();
+
+        if (GameManager.Instance.currentGreenIndex == GameManager.Instance.greens.Length -1 )
+        {
+            EventManager.Instance.OnGameStateChange.Invoke(GameManager.State.GameOver);
+            string gOText = "";
+            gOText += "Hole\t\tPar\tStrokes\tResult\n";
+
+            foreach (GameManager.Score scoreCard in GameManager.Instance.scores)
+            {
+                gOText += scoreCard.description + "\t" + scoreCard.par.ToString() + "\t" + scoreCard.strokes.ToString() + "\n";
+            }
+            gameOverText.GetComponent<TextMeshProUGUI>().text = gOText;
+            gameOverPanel.SetActive(true);
+
+        }
+        else
+        {
+            SetMainItems(true);
+            powerBar.sizeDelta = new Vector2(30, 0);
+            EventManager.Instance.OnNextGreen.Invoke();
+        }
 
     }
 
@@ -86,14 +115,11 @@ public class UIManager : MonoBehaviour
 
         settingsPanel.SetActive(true);
         eventSystem.SetSelectedGameObject(settingsPanel.transform.Find("Exit Button").gameObject);
-        //GameManager.Instance.gameState = GameManager.State.Menu;
         EventManager.Instance.OnGameStateChange.Invoke(GameManager.State.Menu);
-
     }
 
     public void OnSettingsExit()
     {
-
         SetMainItems(true);
 
         settingsPanel.SetActive(false);
@@ -111,27 +137,22 @@ public class UIManager : MonoBehaviour
 
         instructionsPanel.SetActive(true);
         eventSystem.SetSelectedGameObject(instructionsPanel.transform.Find("Exit Button").gameObject);
-        //GameManager.Instance.gameState = GameManager.State.Menu;
         EventManager.Instance.OnGameStateChange.Invoke(GameManager.State.Menu);
 
     }
     public void OnInstructionsExit()
     {
-
         SetMainItems(true);
 
         instructionsPanel.SetActive(false);
         StartCoroutine("SetIdleNextFrame"); // Apply next frame so Space for putt is not triggered
-
     }
 
     // Wait one frame to clear Space/Return key press
     IEnumerator SetIdleNextFrame()
     {
         yield return null;
-        //GameManager.Instance.gameState = GameManager.State.Idle;
         EventManager.Instance.OnGameStateChange.Invoke(GameManager.State.Idle);
-
     }
 
     void SetMainItems(bool state)

@@ -11,9 +11,6 @@ public class CustomEvents
     [System.Serializable] public class EventStroke : UnityEvent { }
     [System.Serializable] public class EventInitializeGreen : UnityEvent { }
     [System.Serializable] public class EventNextGreen : UnityEvent { }
-    [System.Serializable] public class EventPutterEnable : UnityEvent { }
-    [System.Serializable] public class EventPutterDisable : UnityEvent { }
-    //[System.Serializable] public class Collision : UnityEvent<GameObject> { }
     [System.Serializable] public class EventPowerBarSizeChange : UnityEvent<Vector2> { }
 }
 
@@ -23,9 +20,6 @@ public class EventManager : Singleton<EventManager>
     public CustomEvents.EventStroke OnStroke;
     public CustomEvents.EventInitializeGreen OnInitializeGreen;
     public CustomEvents.EventNextGreen OnNextGreen;
-    public CustomEvents.EventPutterEnable OnPutterEnable;
-    public CustomEvents.EventPutterDisable OnPutterDisable;
-    //public CustomEvents.Collision OnCollision;
     public CustomEvents.EventPowerBarSizeChange OnPowerBarSizeChange;
 
     protected override void Awake()

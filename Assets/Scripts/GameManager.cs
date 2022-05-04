@@ -1,3 +1,15 @@
+/*
+ 
+Listens for:
+    OnGameStateChange
+    OnStroke
+    OnNextGreen
+    OnInitializeGreen
+
+Invokes:
+
+*/
+
 using UnityEngine;
 using Cinemachine;
 using System.Collections;
@@ -11,7 +23,8 @@ public class GameManager : Singleton<GameManager>
         Putting,
         Putting2,
         Moving,
-        Win
+        Hole,
+        GameOver
     }
 
     public Hashtable result = new Hashtable()
@@ -27,6 +40,14 @@ public class GameManager : Singleton<GameManager>
         {"4", "Quadruple Bogie"}
     };
 
+    public struct Score
+    {
+        public string description;
+        public int par;
+        public int strokes;
+    }
+
+    public Score[] scores;
 
     public CinemachineVirtualCamera ballCam;
     public Transform followParentT;
@@ -35,14 +56,18 @@ public class GameManager : Singleton<GameManager>
     public GameObject[] greens;
     public GameObject currentGreenObject;
     public int currentGreenIndex = 0;
-    public int par = 0;
-    public int stroke = 0;
+
+    //public int currentGreenPar = 0;
+    //public int currentGreenStrokes = 0;
+    //[SerializeField] string description;
+
+    public int totalStrokes = 0;
+    public int totalPar = 0;
 
     public State gameState;
 
     Vector3 holeTarget;
 
-    [SerializeField] string description;
     [SerializeField] Vector3 currentTeeStartPosition;
     [SerializeField] Vector3 currentTeeStartRotation;
 
@@ -58,15 +83,26 @@ public class GameManager : Singleton<GameManager>
         EventManager.Instance.OnNextGreen.AddListener(HandleOnNextGreen);
         EventManager.Instance.OnInitializeGreen.AddListener(InitializeGreen);
 
+        scores = new Score[greens.Length];
+
         ballCam = GameObject.Find("CM BallCam").GetComponent<CinemachineVirtualCamera>();
         InitializeGreen();
-        stroke = 0;
 
         gameState = State.Menu;
+
+        foreach(GameObject green in greens)
+        {
+            totalPar += green.GetComponent<Data>().par;
+        }
     }
 
     void Update()
     {
+        if (gameState == State.GameOver)
+        {
+            return;
+        }
+
         followParentT.position = ballT.position;
 
         if (Input.GetKeyDown(KeyCode.R))
@@ -89,8 +125,6 @@ public class GameManager : Singleton<GameManager>
         base.OnDestroy();
     }
 
-    // Event Handlers
-
     void HandleOnGameStateChange(State newState)
     {
         gameState = newState;
@@ -98,7 +132,9 @@ public class GameManager : Singleton<GameManager>
 
     void HandleOnStroke()
     {
-        stroke++;
+        //currentGreenStrokes++;
+        scores[currentGreenIndex].strokes++;
+        totalStrokes++;
     }
 
     void HandleOnNextGreen()
@@ -106,26 +142,23 @@ public class GameManager : Singleton<GameManager>
         NextGreen();
     }
 
-
     void NextGreen()
     {
         currentGreenIndex = currentGreenIndex == greens.Length - 1 ? 0 : currentGreenIndex + 1;
         InitializeGreen();
-        stroke = 0;
+        //stroke = 0;
     }
-
 
     void InitializeGreen()
     {
-
         currentGreenObject = greens[currentGreenIndex];
 
         currentTeeStartPosition = currentGreenObject.transform.Find("Tee").transform.position;
         currentTeeStartRotation = currentGreenObject.transform.Find("Tee").transform.eulerAngles;
         holeTarget = currentGreenObject.transform.Find("Hole").transform.position;
 
-        par = currentGreenObject.GetComponent<Data>().par;
-        description = currentGreenObject.GetComponent<Data>().description;
+        scores[currentGreenIndex].par = currentGreenObject.GetComponent<Data>().par;
+        scores[currentGreenIndex].description = currentGreenObject.GetComponent<Data>().description;
 
         ballRB.velocity = Vector3.zero;  // message?
         ballRB.angularVelocity = Vector3.zero;  // message?
