@@ -11,7 +11,6 @@ Invokes:
 */
 
 using UnityEngine;
-using Cinemachine;
 using System.Collections;
 
 public class GameManager : Singleton<GameManager>
@@ -24,7 +23,8 @@ public class GameManager : Singleton<GameManager>
         Putting2,
         Moving,
         Hole,
-        GameOver
+        GameOver,
+        Restart
     }
 
     public Hashtable result = new Hashtable()
@@ -47,33 +47,27 @@ public class GameManager : Singleton<GameManager>
         public int strokes;
     }
 
+    public State gameState;
     public Score[] scores;
 
-    public CinemachineVirtualCamera ballCam;
-    public Transform followParentT;
-    public Transform ballT;
-    public Rigidbody ballRB;
     public GameObject[] greens;
-    public GameObject currentGreenObject;
     public int currentGreenIndex = 0;
+    public GameObject currentGreenObject;
 
-    //public int currentGreenPar = 0;
-    //public int currentGreenStrokes = 0;
-    //[SerializeField] string description;
+    [SerializeField] int totalStrokes = 0;
+    [SerializeField] int totalPar = 0;
 
-    public int totalStrokes = 0;
-    public int totalPar = 0;
+    Vector3 holeTargetPosition;
+    Vector3 currentTeeStartPosition;
+    Vector3 currentTeeStartRotation;
 
-    public State gameState;
-
-    Vector3 holeTarget;
-
-    [SerializeField] Vector3 currentTeeStartPosition;
-    [SerializeField] Vector3 currentTeeStartRotation;
+    #region Unity Callbacks
 
     protected override void Awake()
     {
         base.Awake();
+        DontDestroyOnLoad(this.gameObject);
+
     }
 
     void Start()
@@ -81,39 +75,23 @@ public class GameManager : Singleton<GameManager>
         EventManager.Instance.OnGameStateChange.AddListener(HandleOnGameStateChange);
         EventManager.Instance.OnStroke.AddListener(HandleOnStroke);
         EventManager.Instance.OnNextGreen.AddListener(HandleOnNextGreen);
-        EventManager.Instance.OnInitializeGreen.AddListener(InitializeGreen);
-
-        scores = new Score[greens.Length];
-
-        ballCam = GameObject.Find("CM BallCam").GetComponent<CinemachineVirtualCamera>();
-        InitializeGreen();
+        EventManager.Instance.OnOutOfBounds.AddListener(HandleOnOutOfBounds);
+        EventManager.Instance.OnGameRestart.AddListener(HandleOnGameRestart);
 
         gameState = State.Menu;
+        scores = new Score[greens.Length];
 
         foreach(GameObject green in greens)
         {
             totalPar += green.GetComponent<Data>().par;
         }
+
+        InitializeGreen();
     }
 
     void Update()
     {
-        if (gameState == State.GameOver)
-        {
-            return;
-        }
 
-        followParentT.position = ballT.position;
-
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            InitializeGreen();
-        }
-
-        if (Input.GetKeyDown(KeyCode.N))
-        {
-            NextGreen();
-        }
     }
 
     protected override void OnDestroy()
@@ -121,9 +99,15 @@ public class GameManager : Singleton<GameManager>
         EventManager.Instance.OnGameStateChange.RemoveListener(HandleOnGameStateChange);
         EventManager.Instance.OnStroke.RemoveListener(HandleOnStroke);
         EventManager.Instance.OnNextGreen.RemoveListener(HandleOnNextGreen);
-        EventManager.Instance.OnInitializeGreen.RemoveListener(InitializeGreen);
+        EventManager.Instance.OnOutOfBounds.RemoveListener(HandleOnOutOfBounds);
+        EventManager.Instance.OnGameRestart.RemoveListener(HandleOnGameRestart);
+
+
+        StopAllCoroutines();
         base.OnDestroy();
     }
+
+    #endregion
 
     void HandleOnGameStateChange(State newState)
     {
@@ -132,21 +116,19 @@ public class GameManager : Singleton<GameManager>
 
     void HandleOnStroke()
     {
-        //currentGreenStrokes++;
         scores[currentGreenIndex].strokes++;
         totalStrokes++;
     }
 
     void HandleOnNextGreen()
     {
-        NextGreen();
-    }
-
-    void NextGreen()
-    {
         currentGreenIndex = currentGreenIndex == greens.Length - 1 ? 0 : currentGreenIndex + 1;
         InitializeGreen();
-        //stroke = 0;
+    }
+
+    void HandleOnOutOfBounds()
+    {
+        InitializeGreen();
     }
 
     void InitializeGreen()
@@ -155,28 +137,22 @@ public class GameManager : Singleton<GameManager>
 
         currentTeeStartPosition = currentGreenObject.transform.Find("Tee").transform.position;
         currentTeeStartRotation = currentGreenObject.transform.Find("Tee").transform.eulerAngles;
-        holeTarget = currentGreenObject.transform.Find("Hole").transform.position;
+        holeTargetPosition = currentGreenObject.transform.Find("Hole").transform.position;
 
         scores[currentGreenIndex].par = currentGreenObject.GetComponent<Data>().par;
         scores[currentGreenIndex].description = currentGreenObject.GetComponent<Data>().description;
 
-        ballRB.velocity = Vector3.zero;  // message?
-        ballRB.angularVelocity = Vector3.zero;  // message?
-
-        ballT.position = currentTeeStartPosition;  // message?
-        ballT.eulerAngles = currentTeeStartRotation;  // message?
-        ballT.LookAt(holeTarget);  // message?
-        ballT.Find("Putter").transform.gameObject.SetActive(true);  // message?
-
-        SetVCam();
-        gameState = State.Idle;
+        EventManager.Instance.OnNewGreenInfo.Invoke(currentTeeStartPosition, currentTeeStartRotation, holeTargetPosition);
+        EventManager.Instance.OnSetVCam.Invoke(currentGreenObject.transform.Find("Hole").transform);
+        EventManager.Instance.OnGameStateChange.Invoke(GameManager.State.Idle);
     }
 
-    void SetVCam()
+    void HandleOnGameRestart()
     {
-        ballCam.LookAt = currentGreenObject.transform.Find("Hole").transform;  // message?
-        followParentT.position = ballT.position;  // message?
-        followParentT.eulerAngles = ballT.eulerAngles;  // message?
+        currentGreenIndex = 0;
+        gameState = State.Menu;
+        scores = new Score[greens.Length];
+        totalStrokes = 0;
+        InitializeGreen();
     }
-
 }

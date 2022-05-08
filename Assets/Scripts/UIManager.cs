@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using TMPro;
 
 public class UIManager : MonoBehaviour
@@ -16,11 +17,15 @@ public class UIManager : MonoBehaviour
     public GameObject resultText;
     public GameObject gameOverText;
     public RectTransform powerBar;
+    public GameObject powerObject;
+    public GameObject puttButton;
+    public GameObject leftButton;
+    public GameObject rightButton;
 
     public EventSystem eventSystem;
     public string result;
 
-    #region Unity callbacks
+    #region Unity Callbacks
 
         void Start()
         {
@@ -34,6 +39,13 @@ public class UIManager : MonoBehaviour
         {
             parText.GetComponent<TextMeshProUGUI>().text = "Par: " + GetPar().ToString();
             strokeText.GetComponent<TextMeshProUGUI>().text = "Stroke: " + GetStrokes().ToString();
+        }
+
+        protected void OnDestroy()
+        {
+            EventManager.Instance.OnGameStateChange.RemoveListener(HandleHole);
+            EventManager.Instance.OnPowerBarSizeChange.RemoveListener(HandlePowerBarSizeChange);
+            StopAllCoroutines();
         }
 
     #endregion
@@ -99,7 +111,7 @@ public class UIManager : MonoBehaviour
 
     }
 
-    public void HandlePowerBarSizeChange(Vector2 newSize)
+    void HandlePowerBarSizeChange(Vector2 newSize)
     {
         powerBar.sizeDelta = newSize;
     }
@@ -128,24 +140,32 @@ public class UIManager : MonoBehaviour
 
     public void OnInstructionsClick()
     {
-        if (GameManager.Instance.gameState != GameManager.State.Idle)
-        {
-            return;
-        }
-
-        SetMainItems(false);
-
         instructionsPanel.SetActive(true);
-        eventSystem.SetSelectedGameObject(instructionsPanel.transform.Find("Exit Button").gameObject);
-        EventManager.Instance.OnGameStateChange.Invoke(GameManager.State.Menu);
-
+        settingsPanel.SetActive(false);
     }
+
     public void OnInstructionsExit()
     {
         SetMainItems(true);
 
         instructionsPanel.SetActive(false);
         StartCoroutine("SetIdleNextFrame"); // Apply next frame so Space for putt is not triggered
+    }
+
+    public void OnQuit()
+    {
+        Debug.Log("Quitting App");
+        Application.Quit();
+    }
+
+    public void OnRestart()
+    {
+        Debug.Log("Restarting App");
+        gameOverPanel.SetActive(false);
+        instructionsPanel.SetActive(true);
+        SetMainItems(false);
+
+        EventManager.Instance.OnGameRestart.Invoke();
     }
 
     // Wait one frame to clear Space/Return key press
@@ -159,9 +179,12 @@ public class UIManager : MonoBehaviour
     {
         titleText.SetActive(state);
         settingsButton.SetActive(state);
-        instructionsButton.SetActive(state);
         parText.SetActive(state);
         strokeText.SetActive(state);
+        powerObject.SetActive(state);
+        puttButton.SetActive(state);
+        leftButton.SetActive(state);
+        rightButton.SetActive(state);
     }
 
 }

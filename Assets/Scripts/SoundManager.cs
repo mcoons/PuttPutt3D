@@ -20,6 +20,12 @@ public class SoundManager : MonoBehaviour
         StartCoroutine("BackgroundSounds");
     }
 
+    protected void OnDestroy()
+    {
+        EventManager.Instance.OnGameStateChange.RemoveListener(HandleOnGameStateChange);
+        StopAllCoroutines();
+    }
+
     void HandleOnGameStateChange(GameManager.State newState)
     {
         if (newState == GameManager.State.Moving)
