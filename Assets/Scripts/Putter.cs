@@ -19,46 +19,23 @@ public class Putter : Singleton<Putter>
 
     #region Unity Callbacks
 
-        protected override void Awake()
-        {
-            base.Awake();
-        }
+    protected override void Awake()
+    {
+        base.Awake();
+    }
 
-        private void Start()
-        {
-            ballT = GameObject.Find("Ball").transform;
-            EventManager.Instance.OnGameStateChange.AddListener(HandleOnGameStateChange);
-        }
+    private void Start()
+    {
+        ballT = GameObject.Find("Ball").transform;
+        EventManager.Instance.OnGameStateChange.AddListener(HandleOnGameStateChange);
+    }
 
-        void Update()
-        {
-            //if (GameManager.Instance.gameState != GameManager.State.Idle)
-            //{
-            //    return;
-            //}
-            //else
-            //if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
-            //{
-            //    rotating = true;
-            //    RotateLeft();
-            //    rotating = false;
-            //}
-            //else 
-            //if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
-            //{
-            //    rotating = true;
-            //    RotateRight();
-            //    rotating = false;
-            //}
-        }
-
-
-        protected override void OnDestroy()
-        {
-            EventManager.Instance.OnGameStateChange.RemoveListener(HandleOnGameStateChange);
-            StopAllCoroutines();
-            base.OnDestroy();
-        }
+    protected override void OnDestroy()
+    {
+        EventManager.Instance.OnGameStateChange.RemoveListener(HandleOnGameStateChange);
+        StopAllCoroutines();
+        base.OnDestroy();
+    }
 
     #endregion
 
@@ -69,11 +46,6 @@ public class Putter : Singleton<Putter>
 
         rotating = true;
 
-        //if (dir == 1)
-        //    StartCoroutine("RotateRight");
-        //else
-        //    StartCoroutine("RotateLeft");
-
         StartCoroutine(Rotate(dir));
     }
 
@@ -82,27 +54,7 @@ public class Putter : Singleton<Putter>
         rotating = false;
     }
 
-    //IEnumerator RotateLeft()
-    //{
-    //    while (rotating)
-    //    {
-    //        transform.RotateAround(ballT.position, Vector3.up, -putterRotationSpeed * Time.deltaTime);
-    //        yield return null;
-    //    }
-    //    yield return null;
-    //}
-
-    //IEnumerator RotateRight()
-    //{
-    //    while (rotating)
-    //    {
-    //        transform.RotateAround(ballT.position, Vector3.up, putterRotationSpeed * Time.deltaTime);
-    //        yield return null;
-    //    }
-    //    yield return null;
-    //}
-
-    IEnumerator Rotate(int dir)
+    private IEnumerator Rotate(int dir)
     {
         while (rotating)
         {
@@ -112,11 +64,11 @@ public class Putter : Singleton<Putter>
         yield return null;
     }
 
-    void HandleOnGameStateChange(GameManager.State newState)
+    private void HandleOnGameStateChange(GameManager.State newState)
     {
         if (newState == GameManager.State.Moving && gameObject.activeSelf)
-            {
-                gameObject.SetActive(false);
+        {
+            gameObject.SetActive(false);
         }
         else
         if (newState == GameManager.State.Idle && !gameObject.activeSelf)

@@ -43,10 +43,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ff14191908f74697948bb29c163ea16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ballT: {fileID: 0}
-  ballRB: {fileID: 0}
-  currentTeeStartPosition: {x: 0, y: 0, z: 0}
-  currentTeeStartRotation: {x: 0, y: 0, z: 0}
-  greens: []
-  currentGreenIndex: 0
+  gameState: 0
+  greens:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  currentGreenIndex: 2
   currentGreenObject: {fileID: 0}
+  totalStrokes: 0
+  totalPar: 0

@@ -18,8 +18,7 @@ using Cinemachine;
 
 public class BallController : Singleton<BallController>
 {
-
-    public float thrust = 0.0f;  // 0 to 1
+    public float thrust = 1000.0f; 
     public float thrustMultiplier = 50.0f;
     public Transform followParentT;
 
@@ -33,10 +32,10 @@ public class BallController : Singleton<BallController>
     Vector3 holeTargetPosition;
     float powerBarHeight;
 
-    float sleepStart;
-    bool longSleep = false;
-    bool checkingSleep = false;
-    public float sleepThreshold = 1.5f;
+    //float sleepStart;
+    //bool longSleep = false;
+    //bool checkingSleep = false;
+    //public float sleepThreshold = 1.5f;
 
     #region Unity Callbacks
 
@@ -45,7 +44,7 @@ public class BallController : Singleton<BallController>
         base.Awake();
     }
 
-    void Start()
+    private void Start()
     {
         EventManager.Instance.OnNewGreenInfo.AddListener(HandleOnNewGreenInfo);
         EventManager.Instance.OnSetVCam.AddListener(HandleOnSetVCam);
@@ -86,30 +85,6 @@ public class BallController : Singleton<BallController>
 
     private void Update()
     {
-        //if (!ballRB.IsSleeping())
-        //{
-        //    checkingSleep = false;
-        //}
-
-        //if (ballRB.IsSleeping() && GameManager.Instance.gameState == GameManager.State.Moving && !checkingSleep)
-        //{
-        //    checkingSleep = true;
-        //    sleepStart = Time.time;
-        //}
-
-        //if (ballRB.IsSleeping() && GameManager.Instance.gameState == GameManager.State.Moving && checkingSleep)
-        //{
-        //    if (Time.time - sleepStart > sleepThreshold)
-        //    {
-        //        checkingSleep = false;
-
-        //        holeTargetT = GameManager.Instance.currentGreenObject.transform.Find("Hole").transform;
-        //        transform.LookAt(holeTargetT);
-        //        EventManager.Instance.OnGameStateChange.Invoke(GameManager.State.Idle);
-        //    }
-        //}
-
-
         if (ballRB.IsSleeping() && GameManager.Instance.gameState == GameManager.State.Moving)
         {
             holeTargetT = GameManager.Instance.currentGreenObject.transform.Find("Hole").transform;
@@ -118,7 +93,6 @@ public class BallController : Singleton<BallController>
         }
 
         followParentT.position =  transform.position;
-
     }
 
     protected override void OnDestroy()
@@ -158,7 +132,7 @@ public class BallController : Singleton<BallController>
         return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
     }
 
-    IEnumerator GetPuttStrength()
+    private IEnumerator GetPuttStrength()
     {
         thrust = 0.0f;
         powerBarHeight = 0.0f;
@@ -178,7 +152,7 @@ public class BallController : Singleton<BallController>
         PuttBall();
     }
 
-    void PuttBall()
+    private void PuttBall()
     {
         direction = transform.position - putterT.position;
         ballRB.AddForce(direction * thrust * thrustMultiplier, ForceMode.Impulse);
@@ -195,7 +169,7 @@ public class BallController : Singleton<BallController>
         } 
     }
 
-    void HandleOnNewGreenInfo(Vector3 teeStartPosition, Vector3 teeStartRotation, Vector3 targetPosition)
+    private void HandleOnNewGreenInfo(Vector3 teeStartPosition, Vector3 teeStartRotation, Vector3 targetPosition)
     {
         currentTeeStartPosition = teeStartPosition;
         currentTeeStartRotation = teeStartRotation;
@@ -210,7 +184,7 @@ public class BallController : Singleton<BallController>
         transform.Find("Putter").transform.gameObject.SetActive(true);  
     }
 
-    void OnCollisionEnter(Collision other)
+    private void OnCollisionEnter(Collision other)
     {
         if (other.gameObject.tag == "Terrain")
         {
@@ -219,7 +193,7 @@ public class BallController : Singleton<BallController>
         }
     }
 
-    void HandleOnSetVCam(Transform holeTransform)
+    private void HandleOnSetVCam(Transform holeTransform)
     {
         ballCam.LookAt = GameManager.Instance.currentGreenObject.transform.Find("Hole").transform;  
         followParentT.position = currentTeeStartPosition;  

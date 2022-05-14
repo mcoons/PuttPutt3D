@@ -27,18 +27,18 @@ public class GameManager : Singleton<GameManager>
         Restart
     }
 
-    public Hashtable result = new Hashtable()
-    {
-        {"-4", "Condor"},
-        {"-3", "Albatross"},
-        {"-2", "Eagle"},
-        {"-1", "Birdie"},
-        {"0", "Par"},
-        {"1", "Bogie"},
-        {"2", "Double Bogie"},
-        {"3", "Triple Bogie"},
-        {"4", "Quadruple Bogie"}
-    };
+    //public Hashtable result = new Hashtable()
+    //{
+    //    {"-4", "Condor"},
+    //    {"-3", "Albatross"},
+    //    {"-2", "Eagle"},
+    //    {"-1", "Birdie"},
+    //    {"0", "Par"},
+    //    {"1", "Bogie"},
+    //    {"2", "Double Bogie"},
+    //    {"3", "Triple Bogie"},
+    //    {"4", "Quadruple Bogie"}
+    //};
 
     public struct Score
     {
@@ -67,10 +67,9 @@ public class GameManager : Singleton<GameManager>
     {
         base.Awake();
         DontDestroyOnLoad(this.gameObject);
-
     }
 
-    void Start()
+    private void Start()
     {
         EventManager.Instance.OnGameStateChange.AddListener(HandleOnGameStateChange);
         EventManager.Instance.OnStroke.AddListener(HandleOnStroke);
@@ -89,11 +88,6 @@ public class GameManager : Singleton<GameManager>
         InitializeGreen();
     }
 
-    void Update()
-    {
-
-    }
-
     protected override void OnDestroy()
     {
         EventManager.Instance.OnGameStateChange.RemoveListener(HandleOnGameStateChange);
@@ -102,36 +96,13 @@ public class GameManager : Singleton<GameManager>
         EventManager.Instance.OnOutOfBounds.RemoveListener(HandleOnOutOfBounds);
         EventManager.Instance.OnGameRestart.RemoveListener(HandleOnGameRestart);
 
-
         StopAllCoroutines();
         base.OnDestroy();
     }
 
     #endregion
 
-    void HandleOnGameStateChange(State newState)
-    {
-        gameState = newState;
-    }
-
-    void HandleOnStroke()
-    {
-        scores[currentGreenIndex].strokes++;
-        totalStrokes++;
-    }
-
-    void HandleOnNextGreen()
-    {
-        currentGreenIndex = currentGreenIndex == greens.Length - 1 ? 0 : currentGreenIndex + 1;
-        InitializeGreen();
-    }
-
-    void HandleOnOutOfBounds()
-    {
-        InitializeGreen();
-    }
-
-    void InitializeGreen()
+    private void InitializeGreen()
     {
         currentGreenObject = greens[currentGreenIndex];
 
@@ -147,7 +118,29 @@ public class GameManager : Singleton<GameManager>
         EventManager.Instance.OnGameStateChange.Invoke(GameManager.State.Idle);
     }
 
-    void HandleOnGameRestart()
+    private void HandleOnGameStateChange(State newState)
+    {
+        gameState = newState;
+    }
+
+    private void HandleOnStroke()
+    {
+        scores[currentGreenIndex].strokes++;
+        totalStrokes++;
+    }
+
+    private void HandleOnNextGreen()
+    {
+        currentGreenIndex = currentGreenIndex == greens.Length - 1 ? 0 : currentGreenIndex + 1;
+        InitializeGreen();
+    }
+
+    private void HandleOnOutOfBounds()
+    {
+        InitializeGreen();
+    }
+
+    private void HandleOnGameRestart()
     {
         currentGreenIndex = 0;
         gameState = State.Menu;

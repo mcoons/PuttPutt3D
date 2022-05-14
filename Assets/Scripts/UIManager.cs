@@ -25,55 +25,70 @@ public class UIManager : MonoBehaviour
     public EventSystem eventSystem;
     public string result;
 
+    public Hashtable results = new Hashtable()
+    {
+        {"-4", "Condor"},
+        {"-3", "Albatross"},
+        {"-2", "Eagle"},
+        {"-1", "Birdie"},
+        {"0", "Par"},
+        {"1", "Bogie"},
+        {"2", "Double Bogie"},
+        {"3", "Triple Bogie"},
+        {"4", "Quadruple Bogie"}
+    };
+
     #region Unity Callbacks
 
-        void Start()
-        {
-            EventManager.Instance.OnGameStateChange.AddListener(HandleHole);
-            EventManager.Instance.OnPowerBarSizeChange.AddListener(HandlePowerBarSizeChange);
+    private void Start()
+    {
+        EventManager.Instance.OnGameStateChange.AddListener(HandleHole);
+        EventManager.Instance.OnPowerBarSizeChange.AddListener(HandlePowerBarSizeChange);
 
-            eventSystem.SetSelectedGameObject(instructionsPanel.transform.Find("Exit Button").gameObject);
-        }
+        eventSystem.SetSelectedGameObject(instructionsPanel.transform.Find("Exit Button").gameObject);
+    }
 
-        private void Update()
-        {
-            parText.GetComponent<TextMeshProUGUI>().text = "Par: " + GetPar().ToString();
-            strokeText.GetComponent<TextMeshProUGUI>().text = "Stroke: " + GetStrokes().ToString();
-        }
+    private void Update()
+    {
+        parText.GetComponent<TextMeshProUGUI>().text = "Par: " + GetPar().ToString();
+        strokeText.GetComponent<TextMeshProUGUI>().text = "Stroke: " + GetStrokes().ToString();
+    }
 
-        protected void OnDestroy()
-        {
-            EventManager.Instance.OnGameStateChange.RemoveListener(HandleHole);
-            EventManager.Instance.OnPowerBarSizeChange.RemoveListener(HandlePowerBarSizeChange);
-            StopAllCoroutines();
-        }
+    protected void OnDestroy()
+    {
+        EventManager.Instance.OnGameStateChange.RemoveListener(HandleHole);
+        EventManager.Instance.OnPowerBarSizeChange.RemoveListener(HandlePowerBarSizeChange);
+        StopAllCoroutines();
+    }
 
     #endregion
 
-    void HandleHole(GameManager.State newState)
+    private void HandleHole(GameManager.State newState)
     {
         if ( newState == GameManager.State.Hole)
         {
             Debug.Log("UIManager: " +
-                GameManager.Instance.result[ (GetStrokes() - GetPar()).ToString()]);
+            //GameManager.Instance.result[(GetStrokes() - GetPar()).ToString()]);
+            results[(GetStrokes() - GetPar()).ToString()]);
 
             StartCoroutine("ShowScoreAndNext");
         }
     }
 
-    int GetPar()
+    private int GetPar()
     {
         return GameManager.Instance.scores[GameManager.Instance.currentGreenIndex].par;
     }
 
-    int GetStrokes()
+    private int GetStrokes()
     {
         return GameManager.Instance.scores[GameManager.Instance.currentGreenIndex].strokes;
     }
 
-    IEnumerator ShowScoreAndNext()
+    private IEnumerator ShowScoreAndNext()
     {
-        result = (string)GameManager.Instance.result[(GetStrokes() - GetPar()).ToString()];
+        //result = (string)GameManager.Instance.result[(GetStrokes() - GetPar()).ToString()];
+        result = (string)results[(GetStrokes() - GetPar()).ToString()];
 
         if (result == null || result == "")
         {
@@ -111,7 +126,7 @@ public class UIManager : MonoBehaviour
 
     }
 
-    void HandlePowerBarSizeChange(Vector2 newSize)
+    private void HandlePowerBarSizeChange(Vector2 newSize)
     {
         powerBar.sizeDelta = newSize;
     }
@@ -135,7 +150,8 @@ public class UIManager : MonoBehaviour
         SetMainItems(true);
 
         settingsPanel.SetActive(false);
-        StartCoroutine("SetIdleNextFrame");  // Apply next frame so Space for putt is not triggered
+        EventManager.Instance.OnGameStateChange.Invoke(GameManager.State.Idle);
+        //StartCoroutine("SetIdleNextFrame");  // Apply next frame so Space for putt is not triggered
     }
 
     public void OnInstructionsClick()
@@ -149,7 +165,8 @@ public class UIManager : MonoBehaviour
         SetMainItems(true);
 
         instructionsPanel.SetActive(false);
-        StartCoroutine("SetIdleNextFrame"); // Apply next frame so Space for putt is not triggered
+        EventManager.Instance.OnGameStateChange.Invoke(GameManager.State.Idle);
+        //StartCoroutine("SetIdleNextFrame"); // Apply next frame so Space for putt is not triggered
     }
 
     public void OnQuit()
@@ -162,6 +179,7 @@ public class UIManager : MonoBehaviour
     {
         Debug.Log("Restarting App");
         gameOverPanel.SetActive(false);
+        settingsPanel.SetActive(false);
         instructionsPanel.SetActive(true);
         SetMainItems(false);
 
@@ -169,13 +187,13 @@ public class UIManager : MonoBehaviour
     }
 
     // Wait one frame to clear Space/Return key press
-    IEnumerator SetIdleNextFrame()
-    {
-        yield return null;
-        EventManager.Instance.OnGameStateChange.Invoke(GameManager.State.Idle);
-    }
+    //private IEnumerator SetIdleNextFrame()
+    //{
+    //    yield return null;
+    //    EventManager.Instance.OnGameStateChange.Invoke(GameManager.State.Idle);
+    //}
 
-    void SetMainItems(bool state)
+    private void SetMainItems(bool state)
     {
         titleText.SetActive(state);
         settingsButton.SetActive(state);

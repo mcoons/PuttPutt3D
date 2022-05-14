@@ -14,7 +14,7 @@ public class SoundManager : MonoBehaviour
     Vector3 tmpPosition = new Vector3(0,0,0);
     int x, z;
 
-    void Start()
+    private void Start()
     {
         EventManager.Instance.OnGameStateChange.AddListener(HandleOnGameStateChange);
         StartCoroutine("BackgroundSounds");
@@ -26,7 +26,7 @@ public class SoundManager : MonoBehaviour
         StopAllCoroutines();
     }
 
-    void HandleOnGameStateChange(GameManager.State newState)
+    private void HandleOnGameStateChange(GameManager.State newState)
     {
         if (newState == GameManager.State.Moving)
         {
@@ -39,28 +39,28 @@ public class SoundManager : MonoBehaviour
         }
     }
 
-    IEnumerator PlayPutt()
+    private IEnumerator PlayPutt()
     {
         puttAudio.SetActive(true);
         yield return new WaitForSeconds(0.5f);
         puttAudio.SetActive(false);
     }
 
-    IEnumerator PlayHole()
+    private IEnumerator PlayHole()
     {
         holeAudio.SetActive(true);
         yield return new WaitForSeconds(0.5f);
         holeAudio.SetActive(false);
     }
 
-    IEnumerator PlayBounce()
+    private IEnumerator PlayBounce()
     {
         bounceAudio.SetActive(true);
         yield return new WaitForSeconds(0.05f);
         bounceAudio.SetActive(false);
     }
 
-    IEnumerator BackgroundSounds()
+    private IEnumerator BackgroundSounds()
     {
         while (true)
         {

@@ -107,11 +107,11 @@ Rigidbody:
   m_GameObject: {fileID: 1685860116928817749}
   serializedVersion: 2
   m_Mass: 1
-  m_Drag: 0.4
-  m_AngularDrag: 0.4
+  m_Drag: 0.5
+  m_AngularDrag: 0.5
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 2
 --- !u!114 &8781217009692984720
@@ -126,14 +126,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bd0cc52db5254187923b7401d24a2f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  holeTarget: {fileID: 0}
-  powerBarHeight: 0
-  putterT: {fileID: 1685860117980245741}
   thrust: 1000
   thrustMultiplier: 50
-  velocityCutoff: 0.2
-  touchedGreenCount: 0
-  touchedRampCount: 0
+  followParentT: {fileID: 0}
 --- !u!1 &1685860117760670400
 GameObject:
   m_ObjectHideFlags: 0
@@ -151,7 +146,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1685860117760670403
 Transform:
   m_ObjectHideFlags: 0
@@ -312,6 +307,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   putterRotationSpeed: 20
+  rotating: 0
 --- !u!120 &25344112
 LineRenderer:
   m_ObjectHideFlags: 0
